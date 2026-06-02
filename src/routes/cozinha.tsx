@@ -73,6 +73,13 @@ function Kitchen() {
   const detectFn = useServerFn(detectIngredients);
   const genFn = useServerFn(generateRecipes);
 
+  const [userEmail, setUserEmail] = useState<string | null>(() => {
+    if (typeof window === "undefined") return null;
+    return localStorage.getItem("chefia:email");
+  });
+  const [showEmailGate, setShowEmailGate] = useState(false);
+  const [emailInput, setEmailInput] = useState("");
+
   const detect = useMutation({
     mutationFn: async (file: File) => {
       const dataUrl = await fileToDataUrl(file);
@@ -106,6 +113,29 @@ function Kitchen() {
     },
     onError: (e: Error) => toast.error(e.message),
   });
+
+  function handleGenerateClick() {
+    if (!userEmail) {
+      setShowEmailGate(true);
+      return;
+    }
+    generate.mutate();
+  }
+
+  function submitEmail(e: React.FormEvent) {
+    e.preventDefault();
+    const v = emailInput.trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) {
+      toast.error("Digite um e-mail válido.");
+      return;
+    }
+    localStorage.setItem("chefia:email", v);
+    setUserEmail(v);
+    setShowEmailGate(false);
+    setEmailInput("");
+    toast.success("Cadastro concluído! Gerando receitas...");
+    generate.mutate();
+  }
 
   function addIngredient(e: React.FormEvent) {
     e.preventDefault();
