@@ -162,6 +162,8 @@ function Landing() {
         </div>
       </section>
 
+      <ReviewsSection />
+
       <SiteFooter />
     </div>
   );
