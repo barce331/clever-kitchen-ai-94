@@ -339,6 +339,47 @@ function Kitchen() {
       </main>
 
       <SiteFooter />
+
+      {showEmailGate && (
+        <div className="fixed inset-0 z-50 grid place-items-center bg-foreground/50 backdrop-blur-sm p-4">
+          <div className="w-full max-w-md rounded-3xl bg-card border border-border shadow-warm p-8 relative">
+            <button
+              onClick={() => setShowEmailGate(false)}
+              className="absolute right-4 top-4 text-muted-foreground hover:text-foreground"
+              aria-label="Fechar"
+            >
+              <X className="h-5 w-5" />
+            </button>
+            <span className="grid place-items-center h-12 w-12 rounded-2xl bg-gradient-warm shadow-warm">
+              <ChefHat className="h-6 w-6 text-primary-foreground" />
+            </span>
+            <h3 className="mt-5 text-2xl">Cadastre-se para cozinhar</h3>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Deixe seu e-mail para liberar a geração de receitas, salvar seus favoritos e receber novidades do Chef IA.
+            </p>
+            <form onSubmit={submitEmail} className="mt-6 space-y-3">
+              <input
+                type="email"
+                required
+                autoFocus
+                value={emailInput}
+                onChange={(e) => setEmailInput(e.target.value)}
+                placeholder="seu@email.com"
+                className="w-full rounded-full border border-border bg-background px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-ring"
+              />
+              <button
+                type="submit"
+                className="w-full rounded-full bg-gradient-warm text-primary-foreground py-3 text-sm font-medium shadow-warm hover:opacity-95"
+              >
+                Continuar e gerar receitas
+              </button>
+              <p className="text-[11px] text-muted-foreground text-center">
+                Sem spam. Você pode sair quando quiser.
+              </p>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
