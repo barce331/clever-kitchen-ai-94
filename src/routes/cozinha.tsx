@@ -24,7 +24,40 @@ export const Route = createFileRoute("/cozinha")({
 const FILTERS = [
   "Vegetariano", "Vegano", "Sem lactose", "Sem glúten", "Low carb", "Fitness", "Até 15 min",
 ];
-const CUISINES = ["Surpreenda-me", "Brasileira", "Italiana", "Japonesa", "Mexicana", "Mediterrânea", "Indiana", "Tailandesa"];
+const CUISINES = [
+  "Surpreenda-me",
+  "Brasileira",
+  "Portuguesa",
+  "Italiana",
+  "Francesa",
+  "Espanhola",
+  "Mediterrânea",
+  "Grega",
+  "Turca",
+  "Marroquina",
+  "Libanesa",
+  "Árabe",
+  "Indiana",
+  "Tailandesa",
+  "Vietnamita",
+  "Japonesa",
+  "Coreana",
+  "Chinesa",
+  "Mexicana",
+  "Peruana",
+  "Argentina",
+  "Americana",
+  "Cajun",
+  "Caribenha",
+  "Africana",
+  "Etíope",
+  "Alemã",
+  "Britânica",
+  "Russa",
+  "Havaiana",
+  "Filipina",
+  "Indonésia",
+];
 
 type Recipe = Awaited<ReturnType<typeof generateRecipes>>["recipes"][number];
 
@@ -39,6 +72,13 @@ function Kitchen() {
 
   const detectFn = useServerFn(detectIngredients);
   const genFn = useServerFn(generateRecipes);
+
+  const [userEmail, setUserEmail] = useState<string | null>(() => {
+    if (typeof window === "undefined") return null;
+    return localStorage.getItem("chefia:email");
+  });
+  const [showEmailGate, setShowEmailGate] = useState(false);
+  const [emailInput, setEmailInput] = useState("");
 
   const detect = useMutation({
     mutationFn: async (file: File) => {
@@ -73,6 +113,29 @@ function Kitchen() {
     },
     onError: (e: Error) => toast.error(e.message),
   });
+
+  function handleGenerateClick() {
+    if (!userEmail) {
+      setShowEmailGate(true);
+      return;
+    }
+    generate.mutate();
+  }
+
+  function submitEmail(e: React.FormEvent) {
+    e.preventDefault();
+    const v = emailInput.trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) {
+      toast.error("Digite um e-mail válido.");
+      return;
+    }
+    localStorage.setItem("chefia:email", v);
+    setUserEmail(v);
+    setShowEmailGate(false);
+    setEmailInput("");
+    toast.success("Cadastro concluído! Gerando receitas...");
+    generate.mutate();
+  }
 
   function addIngredient(e: React.FormEvent) {
     e.preventDefault();
@@ -224,7 +287,7 @@ function Kitchen() {
             </div>
 
             <button
-              onClick={() => generate.mutate()}
+              onClick={handleGenerateClick}
               disabled={ingredients.length === 0 || generate.isPending}
               className="w-full rounded-full bg-gradient-warm text-primary-foreground py-4 text-base font-medium shadow-warm hover:opacity-95 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
             >
@@ -238,6 +301,11 @@ function Kitchen() {
                 </>
               )}
             </button>
+            {userEmail && (
+              <p className="text-xs text-muted-foreground text-center">
+                Conectado como <span className="font-medium text-foreground">{userEmail}</span>
+              </p>
+            )}
           </section>
 
           {/* RECIPES */}
@@ -271,6 +339,47 @@ function Kitchen() {
       </main>
 
       <SiteFooter />
+
+      {showEmailGate && (
+        <div className="fixed inset-0 z-50 grid place-items-center bg-foreground/50 backdrop-blur-sm p-4">
+          <div className="w-full max-w-md rounded-3xl bg-card border border-border shadow-warm p-8 relative">
+            <button
+              onClick={() => setShowEmailGate(false)}
+              className="absolute right-4 top-4 text-muted-foreground hover:text-foreground"
+              aria-label="Fechar"
+            >
+              <X className="h-5 w-5" />
+            </button>
+            <span className="grid place-items-center h-12 w-12 rounded-2xl bg-gradient-warm shadow-warm">
+              <ChefHat className="h-6 w-6 text-primary-foreground" />
+            </span>
+            <h3 className="mt-5 text-2xl">Cadastre-se para cozinhar</h3>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Deixe seu e-mail para liberar a geração de receitas, salvar seus favoritos e receber novidades do Chef IA.
+            </p>
+            <form onSubmit={submitEmail} className="mt-6 space-y-3">
+              <input
+                type="email"
+                required
+                autoFocus
+                value={emailInput}
+                onChange={(e) => setEmailInput(e.target.value)}
+                placeholder="seu@email.com"
+                className="w-full rounded-full border border-border bg-background px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-ring"
+              />
+              <button
+                type="submit"
+                className="w-full rounded-full bg-gradient-warm text-primary-foreground py-3 text-sm font-medium shadow-warm hover:opacity-95"
+              >
+                Continuar e gerar receitas
+              </button>
+              <p className="text-[11px] text-muted-foreground text-center">
+                Sem spam. Você pode sair quando quiser.
+              </p>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
