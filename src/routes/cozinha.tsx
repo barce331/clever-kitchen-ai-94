@@ -439,14 +439,8 @@ function RecipeCard({
         <span className="inline-flex items-center gap-1.5"><Sparkles className="h-4 w-4" />{recipe.difficulty}</span>
       </div>
 
-      <div className="mt-6 grid md:grid-cols-2 gap-4">
+      <div className="mt-6">
         <Panel title="Você usa" items={recipe.ingredients_used} accent="herb" />
-        <Panel
-          title="Lista de compras"
-          items={recipe.missing_ingredients.length ? recipe.missing_ingredients : ["Tudo o que precisa você já tem!"]}
-          accent="spice"
-          icon={<ShoppingBasket className="h-4 w-4" />}
-        />
       </div>
 
       <div className="mt-6">
