@@ -24,7 +24,40 @@ export const Route = createFileRoute("/cozinha")({
 const FILTERS = [
   "Vegetariano", "Vegano", "Sem lactose", "Sem glúten", "Low carb", "Fitness", "Até 15 min",
 ];
-const CUISINES = ["Surpreenda-me", "Brasileira", "Italiana", "Japonesa", "Mexicana", "Mediterrânea", "Indiana", "Tailandesa"];
+const CUISINES = [
+  "Surpreenda-me",
+  "Brasileira",
+  "Portuguesa",
+  "Italiana",
+  "Francesa",
+  "Espanhola",
+  "Mediterrânea",
+  "Grega",
+  "Turca",
+  "Marroquina",
+  "Libanesa",
+  "Árabe",
+  "Indiana",
+  "Tailandesa",
+  "Vietnamita",
+  "Japonesa",
+  "Coreana",
+  "Chinesa",
+  "Mexicana",
+  "Peruana",
+  "Argentina",
+  "Americana",
+  "Cajun",
+  "Caribenha",
+  "Africana",
+  "Etíope",
+  "Alemã",
+  "Britânica",
+  "Russa",
+  "Havaiana",
+  "Filipina",
+  "Indonésia",
+];
 
 type Recipe = Awaited<ReturnType<typeof generateRecipes>>["recipes"][number];
 
