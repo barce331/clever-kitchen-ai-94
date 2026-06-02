@@ -287,7 +287,7 @@ function Kitchen() {
             </div>
 
             <button
-              onClick={() => generate.mutate()}
+              onClick={handleGenerateClick}
               disabled={ingredients.length === 0 || generate.isPending}
               className="w-full rounded-full bg-gradient-warm text-primary-foreground py-4 text-base font-medium shadow-warm hover:opacity-95 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
             >
@@ -301,6 +301,11 @@ function Kitchen() {
                 </>
               )}
             </button>
+            {userEmail && (
+              <p className="text-xs text-muted-foreground text-center">
+                Conectado como <span className="font-medium text-foreground">{userEmail}</span>
+              </p>
+            )}
           </section>
 
           {/* RECIPES */}
