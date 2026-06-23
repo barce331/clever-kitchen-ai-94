@@ -3,7 +3,7 @@ import { useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Camera, Loader2, Plus, Sparkles, X, Clock, Users, ChefHat, ShoppingBasket, Lightbulb, Heart, Globe2 } from "lucide-react";
+import { Camera, Loader2, Plus, Sparkles, X, Clock, Users, ChefHat, Lightbulb, Heart, Globe2, Flame, Replace, ShoppingBasket } from "lucide-react";
 
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
