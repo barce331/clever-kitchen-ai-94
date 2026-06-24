@@ -96,9 +96,10 @@ export const generateRecipes = createServerFn({ method: "POST" })
             "1) TODOS os ingredientes DEVEM ter QUANTIDADE e UNIDADE em medidas usadas no Brasil (g, kg, ml, L, xícara (chá), colher (sopa), colher (chá), unidade, dente, fatia, pitada, a gosto). Nunca cite um ingrediente sem quantidade.\n" +
             "2) O modo de preparo deve ter PASSOS LONGOS, ESPECÍFICOS e DIDÁTICOS — descreva temperatura (ex: fogo médio-alto), tempo de cada etapa, ponto visual (ex: 'até dourar nas bordas, ~4 min'), técnica e tamanhos de corte. Cada passo deve ter pelo menos 2 frases completas.\n" +
             "3) Calcule calorias aproximadas POR PORÇÃO de forma realista.\n" +
-            "4) Forneça sugestões de substituição para os ingredientes principais (ex: 'creme de leite → iogurte natural integral').\n" +
-            "5) Você pode assumir temperos básicos disponíveis (sal, pimenta-do-reino, óleo, água) e listá-los com quantidade. Marque como faltantes apenas o que o usuário realmente não tem.\n" +
+            "4) Forneça sugestões de substituição para os ingredientes principais (ex: 'creme de leite → iogurte natural integral'), usando apenas itens que provavelmente já estão na cozinha.\n" +
+            "5) NUNCA gere lista de compras, ingredientes faltantes ou itens para o usuário comprar. Use EXCLUSIVAMENTE os ingredientes que o usuário informou possuir, mais temperos básicos universais (sal, pimenta-do-reino, óleo, água). O campo missing_ingredients DEVE ser sempre um array vazio [].\n" +
             "6) Responda 100% em português brasileiro.",
+
         },
         {
           role: "user",
