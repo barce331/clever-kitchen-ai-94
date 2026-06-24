@@ -1,62 +1,60 @@
 import { useEffect, useState } from "react";
 import { Star, Quote } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 type Review = {
   id: string;
   name: string;
   rating: number;
   comment: string;
-  date: string;
+  created_at: string;
 };
 
-const SEED: Review[] = [
-  {
-    id: "seed-1",
-    name: "Mariana S.",
-    rating: 5,
-    comment:
-      "Tirei foto da geladeira meio vazia e o Chef IA me salvou no jantar de quarta. Receita incrível com 4 ingredientes!",
-    date: "há 2 dias",
-  },
-  {
-    id: "seed-2",
-    name: "Rafael C.",
-    rating: 5,
-    comment:
-      "Economizo no mercado e como melhor. Os filtros de culinária mediterrânea e japonesa são meus favoritos.",
-    date: "há 1 semana",
-  },
-  {
-    id: "seed-3",
-    name: "Júlia P.",
-    rating: 4,
-    comment:
-      "Diminuiu muito o desperdício aqui em casa. Adoro a dica do chef no final de cada receita.",
-    date: "há 2 semanas",
-  },
-];
+function formatRelative(iso: string) {
+  const diff = Date.now() - new Date(iso).getTime();
+  const m = Math.floor(diff / 60000);
+  if (m < 1) return "agora";
+  if (m < 60) return `há ${m} min`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `há ${h} h`;
+  const d = Math.floor(h / 24);
+  if (d < 7) return `há ${d} dia${d > 1 ? "s" : ""}`;
+  const w = Math.floor(d / 7);
+  if (w < 5) return `há ${w} semana${w > 1 ? "s" : ""}`;
+  return new Date(iso).toLocaleDateString("pt-BR");
+}
 
 export function ReviewsSection() {
-  const [reviews, setReviews] = useState<Review[]>(SEED);
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [loading, setLoading] = useState(true);
   const [name, setName] = useState("");
   const [rating, setRating] = useState(0);
   const [hover, setHover] = useState(0);
   const [comment, setComment] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  async function fetchReviews() {
+    setLoading(true);
+    const { data, error } = await supabase
+      .from("reviews")
+      .select("id, name, comment, rating, created_at")
+      .order("created_at", { ascending: false })
+      .limit(100);
+    if (error) {
+      console.error("Erro ao buscar avaliações:", error);
+      toast.error("Não foi possível carregar as avaliações.");
+    } else {
+      setReviews(data ?? []);
+    }
+    setLoading(false);
+  }
 
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem("chefia:reviews");
-      if (stored) {
-        const parsed: Review[] = JSON.parse(stored);
-        setReviews([...parsed, ...SEED]);
-      }
-    } catch {
-      /* ignore */
-    }
+    fetchReviews();
   }, []);
 
-  function submit(e: React.FormEvent) {
+  async function submit(e: React.FormEvent) {
     e.preventDefault();
     if (!name.trim() || !comment.trim()) {
       toast.error("Preencha seu nome e a avaliação.");
@@ -66,22 +64,25 @@ export function ReviewsSection() {
       toast.error("Escolha de 1 a 5 estrelas.");
       return;
     }
-    const newReview: Review = {
-      id: crypto.randomUUID(),
-      name: name.trim(),
-      rating,
-      comment: comment.trim(),
-      date: "agora",
-    };
-    try {
-      const stored = localStorage.getItem("chefia:reviews");
-      const parsed: Review[] = stored ? JSON.parse(stored) : [];
-      const next = [newReview, ...parsed].slice(0, 50);
-      localStorage.setItem("chefia:reviews", JSON.stringify(next));
-    } catch {
-      /* ignore */
+    setSubmitting(true);
+    const { data, error } = await supabase
+      .from("reviews")
+      .insert({
+        name: name.trim().slice(0, 60),
+        comment: comment.trim().slice(0, 500),
+        rating,
+      })
+      .select("id, name, comment, rating, created_at")
+      .single();
+    setSubmitting(false);
+
+    if (error) {
+      console.error("Erro ao salvar avaliação:", error);
+      toast.error("Não foi possível enviar sua avaliação. Tente novamente.");
+      return;
     }
-    setReviews((r) => [newReview, ...r]);
+
+    if (data) setReviews((r) => [data, ...r]);
     setName("");
     setComment("");
     setRating(0);
@@ -188,15 +189,24 @@ export function ReviewsSection() {
 
             <button
               type="submit"
-              className="w-full rounded-full bg-gradient-warm text-primary-foreground py-3 text-sm font-medium shadow-warm hover:opacity-95"
+              disabled={submitting}
+              className="w-full rounded-full bg-gradient-warm text-primary-foreground py-3 text-sm font-medium shadow-warm hover:opacity-95 disabled:opacity-60"
             >
-              Enviar avaliação
+              {submitting ? "Enviando..." : "Enviar avaliação"}
             </button>
           </div>
         </form>
 
         {/* LIST */}
         <div className="lg:col-span-7 space-y-4">
+          {loading && (
+            <p className="text-sm text-muted-foreground">Carregando avaliações...</p>
+          )}
+          {!loading && reviews.length === 0 && (
+            <p className="text-sm text-muted-foreground">
+              Seja o primeiro a avaliar o Chef IA!
+            </p>
+          )}
           {reviews.map((r) => (
             <article
               key={r.id}
@@ -209,7 +219,9 @@ export function ReviewsSection() {
                   </span>
                   <div>
                     <p className="font-medium">{r.name}</p>
-                    <p className="text-xs text-muted-foreground">{r.date}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {formatRelative(r.created_at)}
+                    </p>
                   </div>
                 </div>
                 <div className="flex">
