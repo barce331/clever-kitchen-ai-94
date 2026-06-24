@@ -301,11 +301,6 @@ function Kitchen() {
                 </>
               )}
             </button>
-            {userEmail && (
-              <p className="text-xs text-muted-foreground text-center">
-                Conectado como <span className="font-medium text-foreground">{userEmail}</span>
-              </p>
-            )}
           </section>
 
           {/* RECIPES */}
