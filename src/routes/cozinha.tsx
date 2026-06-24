@@ -442,12 +442,10 @@ function RecipeCard({
         ) : null}
       </div>
 
-      <div className="mt-6 grid md:grid-cols-2 gap-4">
+      <div className="mt-6">
         <IngredientsPanel title="Ingredientes" items={recipe.ingredients_used} accent="herb" />
-        {recipe.missing_ingredients?.length > 0 && (
-          <IngredientsPanel title="Você precisará comprar" items={recipe.missing_ingredients} accent="spice" icon={<ShoppingBasket className="h-4 w-4" />} />
-        )}
       </div>
+
 
       <div className="mt-8">
         <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Modo de preparo</h4>
